@@ -83,10 +83,10 @@
     .step-text {
       font-size: 13px;
       line-height: 1.55;
-      color: #7a8299;
+      color: #9aa5be;
     }
 
-    .step-text strong { color: #9aa5be; font-weight: 500; }
+    .step-text strong { color: #c8cfdf; font-weight: 500; }
 
     .step-text a {
       color: #818cf8;
@@ -102,10 +102,10 @@
       gap: 8px;
       width: 100%;
       padding: 12px;
-      background: #0d1018;
-      border: 1px solid #1a1f2e;
+      background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
+      border: none;
       border-radius: 12px;
-      color: #9aa5be;
+      color: #e0e4f4;
       font-family: 'DM Sans', sans-serif;
       font-size: 12px;
       font-weight: 500;
@@ -115,17 +115,18 @@
       text-decoration: none;
       margin-top: 18px;
       transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
     }
 
-    .btn svg { width: 14px; height: 14px; opacity: 0.6; }
+    .btn svg { width: 14px; height: 14px; opacity: 0.8; }
 
     .btn:hover {
-      border-color: #252d42;
-      color: #d4d8e8;
-      background: #111520;
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
     }
 
-    .btn:hover svg { opacity: 1; }
+    .btn:active { transform: translateY(0); }
 
     .footer {
       margin: 14px 0 0;

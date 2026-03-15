@@ -4,15 +4,16 @@ Export your known words from the Migaku Browser Extension to JSON, CSV, or TXT.
 
 ## Features
 
-- **One-Click Export**: Just click the button on study.migaku.com
-- **Multiple Formats**: Export as JSON (with metadata), TXT (simple list), or CSV (Excel-compatible)
-- **Privacy-First**: All processing happens locally in your browser - no data is ever uploaded
-- **Statistics**: See your vocabulary breakdown (Known, Learning, Unknown, Ignored)
+- **One-Click Export**: Click the button on study.migaku.com
+- **Category Filters**: Choose which words to include (Known, Learning, Unknown, Ignored)
+- **Multiple Formats**: Export as JSON, TXT, or CSV (Excel-compatible)
+- **Privacy-First**: All processing happens locally in your browser
+- **Statistics**: See your vocabulary breakdown at a glance
 
 ## Installation
 
-### From Chrome Web Store (coming soon)
-*Pending review*
+### From Chrome Web Store
+[Migaku Word Exporter](https://chromewebstore.google.com/detail/akkpijkjiihgcalbfoobconnlnalafbd)
 
 ### Manual Installation (Developer Mode)
 1. Download or clone this repository
@@ -24,45 +25,45 @@ Export your known words from the Migaku Browser Extension to JSON, CSV, or TXT.
 ## Usage
 
 1. Go to [study.migaku.com](https://study.migaku.com) and make sure you're logged in
-2. Click the purple **"Export Words"** button in the bottom-right corner
+2. Click the **"Export Words"** button in the top-right corner
 3. A new tab opens with your vocabulary statistics
-4. Click **JSON**, **TXT**, or **CSV** to download your words
+4. Select which categories to include
+5. Click **JSON**, **TXT**, or **CSV** to download
 
 ## Export Formats
 
 ### JSON
 ```json
 {
-  "exported": "2024-03-15T12:00:00.000Z",
+  "exported": "2026-03-15T12:00:00.000Z",
   "totalWords": 9762,
-  "knownCount": 3634,
-  "knownWords": [
+  "filters": ["KNOWN"],
+  "count": 3636,
+  "words": [
     {
       "word": "食べる",
       "reading": "たべる",
-      "partOfSpeech": "verb",
-      "language": "ja"
+      "language": "ja",
+      "status": "KNOWN"
     }
   ]
 }
 ```
 
+### CSV
+Excel/Google Sheets compatible:
+```
+Word,Reading,Language,Status
+食べる,たべる,ja,KNOWN
+飲む,のむ,ja,KNOWN
+```
+
 ### TXT
-Simple list with one word per line:
+One word per line:
 ```
 食べる
 飲む
 行く
-...
-```
-
-### CSV
-Excel/Google Sheets compatible:
-```
-Word,Reading,Part of Speech,Language
-食べる,たべる,verb,ja
-飲む,のむ,verb,ja
-...
 ```
 
 ## Why This Tool?

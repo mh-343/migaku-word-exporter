@@ -6,6 +6,11 @@
 
   if (document.getElementById('migaku-export-btn')) return;
 
+  function isAuthPage() {
+    const p = window.location.pathname;
+    return p === '/login' || p === '/register' || p.startsWith('/login') || p.startsWith('/register');
+  }
+
   const btn = document.createElement('button');
   btn.id = 'migaku-export-btn';
   btn.innerHTML = `
@@ -16,6 +21,24 @@
     Export Words
   `;
   document.body.appendChild(btn);
+
+  function updateVisibility() {
+    btn.style.display = isAuthPage() ? 'none' : 'flex';
+  }
+  updateVisibility();
+
+  // Watch SPA navigation (history.pushState / back/forward)
+  const origPushState = history.pushState.bind(history);
+  history.pushState = function(...args) {
+    origPushState(...args);
+    updateVisibility();
+  };
+  const origReplaceState = history.replaceState.bind(history);
+  history.replaceState = function(...args) {
+    origReplaceState(...args);
+    updateVisibility();
+  };
+  window.addEventListener('popstate', updateVisibility);
 
   function showToast(message, isError = false) {
     const existing = document.getElementById('migaku-export-toast');

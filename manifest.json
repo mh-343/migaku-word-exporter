@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Export your known words from Migaku to JSON, CSV, or TXT",
   "author": "Community Tool",
-  "permissions": ["storage", "unlimitedStorage"],
+  "permissions": ["storage", "unlimitedStorage", "downloads"],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },

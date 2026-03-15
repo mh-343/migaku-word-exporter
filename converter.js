@@ -1,6 +1,40 @@
 let wordData = [];
 let SQL;
 
+const filterState = { KNOWN: true, LEARNING: false, UNKNOWN: false, IGNORED: false };
+
+const STATUS_ORDER = { KNOWN: 0, LEARNING: 1, UNKNOWN: 2, IGNORED: 3 };
+
+function getFilteredWords() {
+    return wordData
+        .filter(w => filterState[w.knownStatus])
+        .sort((a, b) => (STATUS_ORDER[a.knownStatus] ?? 9) - (STATUS_ORDER[b.knownStatus] ?? 9));
+}
+
+function updateFilterCount() {
+    const count = getFilteredWords().length;
+    document.getElementById('filter-count').textContent = count.toLocaleString();
+}
+
+function initFilterToggles() {
+    const map = { 'filter-known': 'KNOWN', 'filter-learning': 'LEARNING', 'filter-unknown': 'UNKNOWN', 'filter-ignored': 'IGNORED' };
+    for (const [id, status] of Object.entries(map)) {
+        document.getElementById(id).addEventListener('click', () => {
+            filterState[status] = !filterState[status];
+            document.getElementById(id).classList.toggle('selected', filterState[status]);
+            updateFilterCount();
+        });
+    }
+    updateFilterCount();
+}
+
+function buildFilename(ext) {
+    const active = Object.entries(filterState).filter(([, v]) => v).map(([k]) => k.toLowerCase());
+    if (active.length === 1 && active[0] === 'known') return `migaku_known_words.${ext}`;
+    if (active.length === 0) return `migaku_words.${ext}`;
+    return `migaku_${active.join('_')}_words.${ext}`;
+}
+
 async function init() {
     try {
         SQL = await initSqlJs({ locateFile: file => file });
@@ -63,6 +97,7 @@ async function processData(items) {
 
     document.getElementById('loading-card').classList.add('hidden');
     document.getElementById('results-card').classList.remove('hidden');
+    initFilterToggles();
 }
 
 function showError(message) {
@@ -72,43 +107,43 @@ function showError(message) {
 }
 
 document.getElementById('btn-json').addEventListener('click', () => {
-    const known = wordData.filter(w => w.knownStatus === 'KNOWN');
+    const words = getFilteredWords();
+    const activeFilters = Object.entries(filterState).filter(([, v]) => v).map(([k]) => k);
     const data = {
         exported: new Date().toISOString(),
         totalWords: wordData.length,
-        knownCount: known.length,
-        knownWords: known.map(w => ({
+        filters: activeFilters,
+        count: words.length,
+        words: words.map(w => ({
             word: w.dictForm,
             reading: w.secondary,
-            partOfSpeech: w.partOfSpeech,
-            language: w.language
+            language: w.language,
+            status: w.knownStatus
         }))
     };
-    downloadBlob(JSON.stringify(data, null, 2), 'migaku_known_words.json', 'application/json');
+    downloadBlob(JSON.stringify(data, null, 2), buildFilename('json'), 'application/json');
 });
 
 document.getElementById('btn-txt').addEventListener('click', () => {
-    const known = wordData.filter(w => w.knownStatus === 'KNOWN');
-    downloadBlob(known.map(w => w.dictForm).join('\n'), 'migaku_known_words.txt', 'text/plain');
+    const words = getFilteredWords();
+    downloadBlob(words.map(w => w.dictForm).join('\n'), buildFilename('txt'), 'text/plain');
 });
 
 document.getElementById('btn-csv').addEventListener('click', () => {
-    const known = wordData.filter(w => w.knownStatus === 'KNOWN');
-    const header = 'Word,Reading,Part of Speech,Language\n';
-    const rows = known.map(w =>
-        `"${(w.dictForm || '').replace(/"/g, '""')}","${(w.secondary || '').replace(/"/g, '""')}","${w.partOfSpeech || ''}","${w.language || ''}"`
+    const words = getFilteredWords();
+    const header = 'Word,Reading,Language,Status\n';
+    const rows = words.map(w =>
+        `"${(w.dictForm || '').replace(/"/g, '""')}","${(w.secondary || '').replace(/"/g, '""')}","${w.language || ''}","${w.knownStatus || ''}"`
     ).join('\n');
-    downloadBlob('\ufeff' + header + rows, 'migaku_known_words.csv', 'text/csv');
+    downloadBlob('\ufeff' + header + rows, buildFilename('csv'), 'text/csv');
 });
 
 function downloadBlob(content, filename, type) {
     const blob = new Blob([content], { type: type + ';charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
+    chrome.downloads.download({ url, filename, saveAs: false }, () => {
+        URL.revokeObjectURL(url);
+    });
 }
 
 init();

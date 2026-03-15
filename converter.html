@@ -16,8 +16,8 @@
             --border:          #1a1f2e;
             --border-hover:    #252d42;
             --text:            #b8c0d4;
-            --text-dim:        #6a748a;
-            --text-muted:      #363d52;
+            --text-dim:        #9aa5be;
+            --text-muted:      #6a748a;
 
             --known:           #34d399;
             --known-glow:      rgba(52, 211, 153, 0.18);
@@ -188,10 +188,11 @@
         .stat.unknown::after    { background: var(--unknown-bg); }
         .stat.ignored::after    { background: var(--ignored-bg); }
 
-        /* unselected: slightly muted numbers */
-        .stat:not(.selected) .stat-num { filter: brightness(0.55); }
-        .stat:not(.selected) .stat-label { color: var(--text-muted); }
-        .stat:not(.selected):hover .stat-num { filter: brightness(0.75); }
+        /* unselected: full color but no glow */
+        .stat:not(.selected) .stat-num { filter: brightness(0.85); }
+        .stat:not(.selected):hover .stat-num { filter: brightness(1); }
+        /* selected: slightly boosted */
+        .stat.selected .stat-num { filter: brightness(1.15); }
 
         .stat.known.selected    { border-color: var(--known-border);    box-shadow: 0 0 22px var(--known-glow); }
         .stat.learning.selected { border-color: var(--learning-border); box-shadow: 0 0 22px var(--learning-glow); }
@@ -225,6 +226,7 @@
             position: relative;
             z-index: 1;
         }
+        .stat:not(.selected) .stat-label { color: var(--text-muted); }
 
         /* ── FILTER HINT ── */
         .filter-hint {

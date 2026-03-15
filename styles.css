@@ -1,7 +1,7 @@
 #migaku-export-btn {
   position: fixed;
-  bottom: 140px;
-  right: 20px;
+  top: 16px;
+  right: 70px;
   z-index: 999999;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -53,7 +53,7 @@
 
 #migaku-export-toast {
   position: fixed;
-  bottom: 200px;
+  top: 70px;
   right: 20px;
   z-index: 999999;
   background: #10b981;

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#141a2e"/>
+      <stop offset="100%" stop-color="#07090e"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#818cf8" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="arrow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+
+  <!-- Subtle inner glow -->
+  <rect width="128" height="128" rx="28" fill="url(#glow)"/>
+
+  <!-- Border -->
+  <rect x="1" y="1" width="126" height="126" rx="27" fill="none"
+        stroke="#1a1f2e" stroke-width="1.5"/>
+
+  <!-- Download arrow: vertical line -->
+  <line x1="64" y1="30" x2="64" y2="76"
+        stroke="url(#arrow)" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- Arrow head -->
+  <polyline points="44,58 64,78 84,58"
+            fill="none" stroke="url(#arrow)" stroke-width="7"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Base line -->
+  <line x1="38" y1="94" x2="90" y2="94"
+        stroke="#34d399" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+</svg>

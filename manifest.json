@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Migaku Word Exporter",
+  "version": "1.0.0",
+  "description": "Export your known words from Migaku to JSON, CSV, or TXT",
+  "author": "Community Tool",
+  "permissions": ["storage", "unlimitedStorage"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "host_permissions": [
+    "https://study.migaku.com/*",
+    "https://*.migaku.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://study.migaku.com/*", "https://*.migaku.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["converter.html", "pako.min.js", "sql-wasm.js", "sql-wasm.wasm"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon48.png"
+    }
+  }
+}

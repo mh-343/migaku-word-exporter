@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migaku Word Exporter</title>
+    <script src="pako.min.js"></script>
+    <script src="sql-wasm.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .container { max-width: 600px; width: 100%; }
+        .header { text-align: center; margin-bottom: 30px; }
+        h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .subtitle { color: #666; font-size: 16px; }
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .loading { text-align: center; padding: 40px; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #eee;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-num { font-size: 28px; font-weight: 700; color: #667eea; }
+        .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+        .stat.known .stat-num { color: #10b981; }
+        .stat.learning .stat-num { color: #f59e0b; }
+        .buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn {
+            flex: 1; min-width: 140px;
+            padding: 14px 20px; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn svg { width: 18px; height: 18px; }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-secondary { background: #f3f4f6; color: #374151; }
+        .btn-secondary:hover { background: #e5e7eb; }
+        .hidden { display: none; }
+        .error {
+            background: #fef2f2; border: 1px solid #fecaca;
+            color: #dc2626; padding: 16px; border-radius: 10px; text-align: center;
+        }
+        .success-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .success-icon svg { width: 32px; height: 32px; color: white; }
+        .footer { text-align: center; color: #999; font-size: 13px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Migaku Word Exporter</h1>
+            <p class="subtitle">Your vocabulary export</p>
+        </div>
+
+        <div class="card" id="loading-card">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Processing your words...</p>
+            </div>
+        </div>
+
+        <div class="card hidden" id="results-card">
+            <div class="success-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <div class="stats">
+                <div class="stat known">
+                    <div class="stat-num" id="stat-known">0</div>
+                    <div class="stat-label">Known</div>
+                </div>
+                <div class="stat learning">
+                    <div class="stat-num" id="stat-learning">0</div>
+                    <div class="stat-label">Learning</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num" id="stat-unknown">0</div>
+                    <div class="stat-label">Unknown</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num" id="stat-ignored">0</div>
+                    <div class="stat-label">Ignored</div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-primary" id="btn-json">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    JSON
+                </button>
+                <button class="btn btn-secondary" id="btn-txt">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    TXT
+                </button>
+                <button class="btn btn-secondary" id="btn-csv">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    CSV
+                </button>
+            </div>
+        </div>
+
+        <div class="card hidden" id="error-card">
+            <div class="error" id="error-message"></div>
+        </div>
+
+        <div class="footer">
+            All processing happens locally. Your data is never uploaded.
+        </div>
+    </div>
+
+    <script src="converter.js"></script>
+</body>
+</html>

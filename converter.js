@@ -106,6 +106,46 @@ function showError(message) {
     document.getElementById('error-message').textContent = message;
 }
 
+function restoreSatoriBtn(btn) {
+    btn.replaceChildren();
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('d', 'M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3');
+    svg.appendChild(path);
+    btn.appendChild(svg);
+    btn.appendChild(document.createTextNode(' Satori'));
+}
+
+document.getElementById('btn-satori').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-satori');
+    const words = getFilteredWords().filter(w => !w.language || w.language === 'ja');
+    const kanjiSet = new Set();
+    for (const w of words) {
+        const matches = (w.dictForm || '').match(/[\u4e00-\u9fff\u3400-\u4dbf]/g);
+        if (matches) matches.forEach(k => kanjiSet.add(k));
+    }
+    if (kanjiSet.size === 0) {
+        btn.textContent = 'No kanji found';
+        setTimeout(() => restoreSatoriBtn(btn), 2000);
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText([...kanjiSet].join(''));
+        btn.classList.add('copied');
+        btn.textContent = `Copied! (${kanjiSet.size})`;
+        setTimeout(() => { btn.classList.remove('copied'); restoreSatoriBtn(btn); }, 2000);
+    } catch {
+        btn.textContent = 'Clipboard error';
+        setTimeout(() => restoreSatoriBtn(btn), 2000);
+    }
+});
+
 document.getElementById('btn-json').addEventListener('click', () => {
     const words = getFilteredWords();
     const activeFilters = Object.entries(filterState).filter(([, v]) => v).map(([k]) => k);

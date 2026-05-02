@@ -72,7 +72,6 @@
             z-index: 1;
         }
 
-        /* ── HEADER ── */
         .header {
             text-align: center;
             margin-bottom: 32px;
@@ -101,7 +100,6 @@
             color: var(--unknown);
         }
 
-        /* ── CARD ── */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -110,7 +108,6 @@
             margin-bottom: 14px;
         }
 
-        /* ── LOADING ── */
         .loading-label {
             font-size: 12px;
             font-weight: 400;
@@ -141,7 +138,6 @@
             100% { width: 0%;  margin-left: 100%; }
         }
 
-        /* ── STATS / FILTERS ── */
         .section-label {
             font-size: 10px;
             font-weight: 500;
@@ -188,10 +184,8 @@
         .stat.unknown::after    { background: var(--unknown-bg); }
         .stat.ignored::after    { background: var(--ignored-bg); }
 
-        /* unselected: full color but no glow */
         .stat:not(.selected) .stat-num { filter: brightness(0.85); }
         .stat:not(.selected):hover .stat-num { filter: brightness(1); }
-        /* selected: slightly boosted */
         .stat.selected .stat-num { filter: brightness(1.15); }
 
         .stat.known.selected    { border-color: var(--known-border);    box-shadow: 0 0 22px var(--known-glow); }
@@ -228,7 +222,6 @@
         }
         .stat:not(.selected) .stat-label { color: var(--text-muted); }
 
-        /* ── FILTER HINT ── */
         .filter-hint {
             font-size: 11px;
             color: var(--text-muted);
@@ -243,15 +236,13 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* ── DIVIDER ── */
         .divider {
             height: 1px;
             background: var(--border);
             margin: 0 -30px 24px;
         }
 
-        /* ── DOWNLOAD BUTTONS ── */
-        .buttons { display: flex; gap: 8px; }
+        .buttons { display: flex; flex-wrap: wrap; gap: 8px; }
 
         .btn {
             flex: 1;
@@ -291,7 +282,12 @@
         .btn:hover svg { opacity: 1; }
         .btn:active { transform: translateY(0); box-shadow: none; }
 
-        /* ── ERROR ── */
+        .btn.copied {
+            border-color: var(--known-border);
+            color: var(--known);
+            box-shadow: 0 0 16px var(--known-glow);
+        }
+
         .hidden { display: none; }
 
         .error {
@@ -305,7 +301,6 @@
             text-align: center;
         }
 
-        /* ── FOOTER ── */
         .footer {
             display: flex;
             align-items: center;
@@ -326,6 +321,23 @@
             height: 1px;
             background: var(--border);
         }
+
+        .kofi-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #e87a6f;
+            text-decoration: none;
+            margin-top: 8px;
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+        }
+
+        .kofi-link svg { width: 14px; height: 14px; }
+
+        .kofi-link:hover { color: #ff9e94; }
     </style>
 </head>
 <body>
@@ -387,6 +399,13 @@
                     </svg>
                     CSV
                 </button>
+                <button class="btn" id="btn-satori" title="Copy unique kanji to clipboard — paste into Satori Reader's Known Kanji field (Preferences > Import/Custom)">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                    </svg>
+                    Satori
+                </button>
             </div>
         </div>
 
@@ -395,6 +414,10 @@
         </div>
 
         <p class="footer">All processing happens locally &mdash; no data is uploaded</p>
+        <a class="kofi-link" href="https://ko-fi.com/jp343" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/></svg>
+            Support this project on Ko-fi
+        </a>
 
     </div>
     <script src="converter.js"></script>

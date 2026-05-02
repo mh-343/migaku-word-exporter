@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Migaku Word Exporter",
-  "version": "1.0.0",
-  "description": "Export your known words from Migaku to JSON, CSV, or TXT",
+  "version": "1.1.0",
+  "description": "Export your known words from Migaku to JSON, CSV, TXT, or Satori Reader",
   "author": "Community Tool",
   "permissions": ["storage", "unlimitedStorage", "downloads"],
   "content_security_policy": {

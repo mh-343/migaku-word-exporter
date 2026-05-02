@@ -1,6 +1,3 @@
-// Migaku Word Exporter - Content Script
-// Exports words directly via extension storage
-
 (function() {
   'use strict';
 
@@ -27,7 +24,6 @@
   }
   updateVisibility();
 
-  // Watch SPA navigation (history.pushState / back/forward)
   const origPushState = history.pushState.bind(history);
   history.pushState = function(...args) {
     origPushState(...args);
@@ -71,7 +67,6 @@
     setLoading(true);
 
     try {
-      // Open IndexedDB
       const db = await new Promise((resolve, reject) => {
         const request = indexedDB.open('srs');
         request.onsuccess = () => resolve(request.result);
@@ -93,11 +88,9 @@
         throw new Error('No data found. Are you logged in?');
       }
 
-      // Convert to array for storage
       const dataToStore = [];
       for (const item of allData) {
         if (item.data && item.data.byteLength > 0) {
-          // Convert Uint8Array to regular array for JSON serialization
           dataToStore.push({
             path: item.path,
             data: Array.from(new Uint8Array(item.data))
@@ -109,7 +102,6 @@
         throw new Error('No database files found');
       }
 
-      // Store in chrome.storage.local and open converter
       chrome.storage.local.set({ migakuExportData: dataToStore }, () => {
         if (chrome.runtime.lastError) {
           showToast('Storage error: ' + chrome.runtime.lastError.message, true);
@@ -120,7 +112,7 @@
       });
 
     } catch (err) {
-      console.error('Migaku Export Error:', err);
+      console.error(err);
       showToast(err.message || 'Export failed', true);
     } finally {
       setLoading(false);
@@ -128,5 +120,4 @@
   }
 
   btn.addEventListener('click', exportWords);
-  console.log('Migaku Word Exporter loaded');
 })();

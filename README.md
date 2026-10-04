@@ -5,6 +5,7 @@ Export your known words from the Migaku Browser Extension to JSON, CSV, or TXT.
 ## Features
 
 - **One-Click Export**: Click the button on study.migaku.com
+- **Language Filter**: If you study several languages, export just one (shown automatically when your Migaku data contains more than one language)
 - **Category Filters**: Choose which words to include (Known, Learning, Unknown, Ignored)
 - **Multiple Formats**: Export as JSON, TXT, or CSV (Excel-compatible)
 - **Privacy-First**: All processing happens locally in your browser
@@ -27,8 +28,9 @@ Export your known words from the Migaku Browser Extension to JSON, CSV, or TXT.
 1. Go to [study.migaku.com](https://study.migaku.com) and make sure you're logged in
 2. Click the **"Export Words"** button in the top-right corner
 3. A new tab opens with your vocabulary statistics
-4. Select which categories to include
-5. Click **JSON**, **TXT**, or **CSV** to download
+4. Pick a language (only shown if you study more than one)
+5. Select which categories to include
+6. Click **JSON**, **TXT**, or **CSV** to download
 
 ## Export Formats
 
@@ -36,6 +38,7 @@ Export your known words from the Migaku Browser Extension to JSON, CSV, or TXT.
 ```json
 {
   "exported": "2026-03-15T12:00:00.000Z",
+  "language": "ja",
   "totalWords": 9762,
   "filters": ["KNOWN"],
   "count": 3636,

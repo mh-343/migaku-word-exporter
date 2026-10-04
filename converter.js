@@ -5,8 +5,34 @@ const filterState = { KNOWN: true, LEARNING: false, UNKNOWN: false, IGNORED: fal
 
 const STATUS_ORDER = { KNOWN: 0, LEARNING: 1, UNKNOWN: 2, IGNORED: 3 };
 
+const LANG_NAMES = {
+    ja: 'Japanese', zh: 'Mandarin', yue: 'Cantonese', ko: 'Korean', vi: 'Vietnamese',
+    en: 'English', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese', es: 'Spanish'
+};
+
+// null = all languages
+let selectedLang = null;
+
+function langOf(w) {
+    return w.language || 'other';
+}
+
+function langName(code) {
+    if (code === 'other') return 'Other';
+    return LANG_NAMES[code] || code.toUpperCase();
+}
+
+// secondary holds the kana reading for Japanese; for other languages it is an internal number
+function readingOf(w) {
+    return !w.language || w.language === 'ja' ? (w.secondary || '') : '';
+}
+
+function getLangWords() {
+    return selectedLang ? wordData.filter(w => langOf(w) === selectedLang) : wordData;
+}
+
 function getFilteredWords() {
-    return wordData
+    return getLangWords()
         .filter(w => filterState[w.knownStatus])
         .sort((a, b) => (STATUS_ORDER[a.knownStatus] ?? 9) - (STATUS_ORDER[b.knownStatus] ?? 9));
 }
@@ -28,11 +54,67 @@ function initFilterToggles() {
     updateFilterCount();
 }
 
+function updateStats() {
+    const stats = { KNOWN: 0, LEARNING: 0, UNKNOWN: 0, IGNORED: 0 };
+    getLangWords().forEach(w => stats[w.knownStatus] = (stats[w.knownStatus] || 0) + 1);
+
+    document.getElementById('stat-known').textContent = stats.KNOWN.toLocaleString();
+    document.getElementById('stat-learning').textContent = stats.LEARNING.toLocaleString();
+    document.getElementById('stat-unknown').textContent = stats.UNKNOWN.toLocaleString();
+    document.getElementById('stat-ignored').textContent = stats.IGNORED.toLocaleString();
+}
+
+function updateSatoriVisibility() {
+    const show = !selectedLang || selectedLang === 'ja';
+    document.getElementById('btn-satori').classList.toggle('hidden', !show);
+    // JP343 is Japanese-only, so only promote it to Japanese learners
+    const hasJapanese = wordData.some(w => !w.language || w.language === 'ja');
+    document.getElementById('jp343-link').classList.toggle('hidden', !show || !hasJapanese);
+}
+
+function initLangFilter() {
+    const counts = {};
+    wordData.forEach(w => counts[langOf(w)] = (counts[langOf(w)] || 0) + 1);
+    const langs = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
+    // Single language: no filter needed, behave as before
+    if (langs.length < 2) return;
+
+    selectedLang = langs[0];
+    const container = document.getElementById('lang-filter');
+
+    const options = [...langs.map(code => ({ code, label: langName(code), count: counts[code] })),
+                     { code: null, label: 'All', count: wordData.length }];
+
+    for (const opt of options) {
+        const chip = document.createElement('button');
+        chip.className = 'lang';
+        chip.classList.toggle('selected', opt.code === selectedLang);
+        chip.appendChild(document.createTextNode(opt.label));
+        const count = document.createElement('span');
+        count.className = 'lang-count';
+        count.textContent = opt.count.toLocaleString();
+        chip.appendChild(count);
+        chip.addEventListener('click', () => {
+            selectedLang = opt.code;
+            container.querySelectorAll('.lang').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            updateStats();
+            updateFilterCount();
+            updateSatoriVisibility();
+        });
+        container.appendChild(chip);
+    }
+
+    document.getElementById('lang-section').classList.remove('hidden');
+}
+
 function buildFilename(ext) {
     const active = Object.entries(filterState).filter(([, v]) => v).map(([k]) => k.toLowerCase());
-    if (active.length === 1 && active[0] === 'known') return `migaku_known_words.${ext}`;
-    if (active.length === 0) return `migaku_words.${ext}`;
-    return `migaku_${active.join('_')}_words.${ext}`;
+    const prefix = selectedLang ? `migaku_${selectedLang}` : 'migaku';
+    if (active.length === 1 && active[0] === 'known') return `${prefix}_known_words.${ext}`;
+    if (active.length === 0) return `${prefix}_words.${ext}`;
+    return `${prefix}_${active.join('_')}_words.${ext}`;
 }
 
 async function init() {
@@ -87,13 +169,9 @@ async function processData(items) {
         throw new Error('No words found in database');
     }
 
-    const stats = { KNOWN: 0, LEARNING: 0, UNKNOWN: 0, IGNORED: 0 };
-    wordData.forEach(w => stats[w.knownStatus] = (stats[w.knownStatus] || 0) + 1);
-
-    document.getElementById('stat-known').textContent = stats.KNOWN.toLocaleString();
-    document.getElementById('stat-learning').textContent = stats.LEARNING.toLocaleString();
-    document.getElementById('stat-unknown').textContent = stats.UNKNOWN.toLocaleString();
-    document.getElementById('stat-ignored').textContent = stats.IGNORED.toLocaleString();
+    initLangFilter();
+    updateStats();
+    updateSatoriVisibility();
 
     document.getElementById('loading-card').classList.add('hidden');
     document.getElementById('results-card').classList.remove('hidden');
@@ -151,12 +229,13 @@ document.getElementById('btn-json').addEventListener('click', () => {
     const activeFilters = Object.entries(filterState).filter(([, v]) => v).map(([k]) => k);
     const data = {
         exported: new Date().toISOString(),
-        totalWords: wordData.length,
+        language: selectedLang || 'all',
+        totalWords: getLangWords().length,
         filters: activeFilters,
         count: words.length,
         words: words.map(w => ({
             word: w.dictForm,
-            reading: w.secondary,
+            reading: readingOf(w),
             language: w.language,
             status: w.knownStatus
         }))
@@ -173,7 +252,7 @@ document.getElementById('btn-csv').addEventListener('click', () => {
     const words = getFilteredWords();
     const header = 'Word,Reading,Language,Status\n';
     const rows = words.map(w =>
-        `"${(w.dictForm || '').replace(/"/g, '""')}","${(w.secondary || '').replace(/"/g, '""')}","${w.language || ''}","${w.knownStatus || ''}"`
+        `"${(w.dictForm || '').replace(/"/g, '""')}","${readingOf(w).replace(/"/g, '""')}","${w.language || ''}","${w.knownStatus || ''}"`
     ).join('\n');
     downloadBlob('\ufeff' + header + rows, buildFilename('csv'), 'text/csv');
 });

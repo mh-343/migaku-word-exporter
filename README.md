@@ -17,11 +17,11 @@ Export your known words from the Migaku Browser Extension to JSON, CSV, or TXT.
 [Migaku Word Exporter](https://chromewebstore.google.com/detail/akkpijkjiihgcalbfoobconnlnalafbd)
 
 ### Manual Installation (Developer Mode)
-1. Download or clone this repository
+1. Download the latest `migaku-word-exporter-x.y.z.zip` from [Releases](https://github.com/mh-343/migaku-word-exporter/releases/latest) and unzip it
 2. Open `chrome://extensions` (or `brave://extensions` for Brave)
 3. Enable **Developer mode** (toggle in top-right)
 4. Click **Load unpacked**
-5. Select the folder containing these files
+5. Select the unzipped folder
 
 ## Usage
 

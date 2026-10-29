@@ -26,7 +26,7 @@ Export your known words from the Migaku Browser Extension to JSON, CSV, or TXT.
 ## Usage
 
 1. Go to [study.migaku.com](https://study.migaku.com) and make sure you're logged in
-2. Click the **"Export Words"** button in the top-right corner
+2. Click the **"Export Words"** button in the top-right corner (drag it anywhere if it covers something; the position is remembered)
 3. A new tab opens with your vocabulary statistics
 4. Pick a language (only shown if you study more than one)
 5. Select which categories to include

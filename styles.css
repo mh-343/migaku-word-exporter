@@ -1,6 +1,6 @@
 #migaku-export-btn {
   position: fixed;
-  top: 16px;
+  top: 72px;
   right: 70px;
   z-index: 999999;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -12,11 +12,13 @@
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   display: flex;
   align-items: center;
   gap: 8px;
+  touch-action: none;
+  user-select: none;
 }
 
 #migaku-export-btn:hover {
@@ -26,6 +28,12 @@
 
 #migaku-export-btn:active {
   transform: translateY(0);
+}
+
+#migaku-export-btn.dragging {
+  transition: none;
+  transform: none;
+  cursor: grabbing;
 }
 
 #migaku-export-btn.loading {
@@ -53,7 +61,7 @@
 
 #migaku-export-toast {
   position: fixed;
-  top: 70px;
+  top: 130px;
   right: 20px;
   z-index: 999999;
   background: #10b981;
